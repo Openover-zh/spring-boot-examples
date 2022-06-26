@@ -2,18 +2,17 @@ package com.neo.rabbit.hello;
 
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 
 @Component
-@RabbitListener(queues = "hello")
+@RabbitListener(queues = "hello") //指定监听队列名
 public class HelloReceiver {
 
-    @RabbitHandler
+    @RabbitHandler // 指定默认接受方法
     public void process(String hello) {
         System.out.println("Receiver  : " + hello);
+
     }
 
 }

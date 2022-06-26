@@ -22,6 +22,8 @@ public class RabbitConfig {
     public Queue objectQueue() {
         return new Queue("object");
     }
-
-
+    @Bean
+    public Queue neoAckQueue(){
+        return new Queue("neo_ack");
+    }
 }

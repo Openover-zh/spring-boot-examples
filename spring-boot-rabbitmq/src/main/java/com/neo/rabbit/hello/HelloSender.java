@@ -18,5 +18,4 @@ public class HelloSender {
 		System.out.println("Sender : " + context);
 		this.rabbitTemplate.convertAndSend("hello", context);
 	}
-
 }

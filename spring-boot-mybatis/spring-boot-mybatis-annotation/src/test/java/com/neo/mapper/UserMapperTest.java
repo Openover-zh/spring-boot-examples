@@ -8,11 +8,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.neo.enums.UserSexEnum;
 
-@RunWith(SpringRunner.class)
+//@RunWith(SpringRunner.class)
+@SpringJUnitConfig
 @SpringBootTest
 public class UserMapperTest {
 

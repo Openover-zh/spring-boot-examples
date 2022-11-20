@@ -1,0 +1,47 @@
+# 测试 水平分库分表
+spring:
+  shardingsphere:
+    datasource:
+      names: ds1,ds2
+      ds1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://127.0.0.1:55003/sharding_sphere_1?serverTimezone=UTC
+        username: root
+        password: root
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      ds2:
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://127.0.0.1:55001/sharding_sphere_2?serverTimezone=UTC
+        username: root
+        password: root
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    sharding:
+      tables:
+        orders:
+          #指定orders表的分布情况，配置表在哪个数据库中，表名称是什么
+          actual-data-nodes: ds$->{1..2}.orders_$->{1..2}
+          #指定orders表里主键id生成策略
+          key-generator:
+            column: id
+            type: SNOWFLAKE
+          #指定分片策略。根据id的奇偶性来判断插入到哪个表
+          table-strategy:
+            inline:
+              sharding-column: id
+              algorithm-expression: orders_$->{id%2+1}
+          # 指定单个表的分库策略 根据order_id进行分库 如果order_id为偶数则在ds1中 否则在ds2中
+          database-strategy:
+            inline:
+              sharding-column: order_id
+              algorithm-expression: ds$->{order_id % 2 + 1}
+      # 默认分库策略 如果不指定单个表的话 会使用这个 指定数据库的分库策略 根据order_id进行分库 如果order_id为偶数则在ds1中 否则在ds2中
+      default-database-strategy:
+        inline:
+          sharding-column: order_id
+          algorithm-expression: ds$->{order_id % 2 + 1}
+    #打开sql输出日志
+    props:
+      sql:
+        show: true
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml

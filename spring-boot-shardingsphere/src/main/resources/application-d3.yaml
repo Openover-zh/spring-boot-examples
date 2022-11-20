@@ -1,0 +1,42 @@
+# 测试 垂直分库
+spring:
+  shardingsphere:
+    datasource:
+      names: ds1,ds2
+      ds1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://127.0.0.1:55003/sharding_sphere_1?serverTimezone=UTC
+        username: root
+        password: root
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      ds2:
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://127.0.0.1:55001/sharding_sphere_2?serverTimezone=UTC
+        username: root
+        password: root
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    sharding:
+      tables:
+        t_orders:
+          #指定orders表的分布情况，配置表在哪个数据库中，表名称是什么
+          actual-data-nodes: ds1.t_orders
+          #指定orders表里主键id生成策略
+          key-generator:
+            column: id
+            type: SNOWFLAKE
+          #指定分片策略。根据id的奇偶性来判断插入到哪个表
+#          table-strategy:
+#            inline:
+#              sharding-column: id
+#              algorithm-expression: t_orders
+        customer:
+          actual-data-nodes: ds2.customer
+          key-generator:
+            column: id
+            type: SNOWFLAKE
+    #打开sql输出日志
+    props:
+      sql:
+        show: true
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml

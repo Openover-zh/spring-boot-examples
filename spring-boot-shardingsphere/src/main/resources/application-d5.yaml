@@ -1,0 +1,59 @@
+# 测试 全局表
+spring:
+  shardingsphere:
+    datasource:
+      names: ds1,ds2
+      ds1:
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://127.0.0.1:55003/sharding_sphere?serverTimezone=UTC
+        username: root
+        password: root
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      ds2:
+        type: com.alibaba.druid.pool.DruidDataSource
+        url: jdbc:mysql://127.0.0.1:55001/sharding_sphere?serverTimezone=UTC
+        username: root
+        password: root
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    sharding:
+      tables:
+        t_order:
+          actual-data-nodes: ds$->{1..2}.t_order$->{1..2}
+          table-strategy:
+            inline:
+              sharding-column: id
+              algorithm-expression: t_order$->{id%2+1}
+          database-strategy:
+            inline:
+              algorithm-expression: ds$->{id%2+1}
+              sharding-column: id
+          #指定orders表里主键id生成策略
+          key-generator:
+            column: id
+            type: SNOWFLAKE
+        t_order_item:
+          actual-data-nodes: ds$->{1..2}.t_order_item$->{1..2}
+          table-strategy:
+            inline:
+              sharding-column: order_id
+              algorithm-expression: t_order_item$->{order_id%2+1}
+          database-strategy:
+            inline:
+              algorithm-expression: ds$->{order_id%2+1}
+              sharding-column: order_id
+          key-generator:
+            type: SNOWFLAKE
+            column: id
+      # 默认表分片策略为不分片
+      default-table-strategy:
+        none:
+      # 绑定t_order和t_order_item
+#      binding-tables:
+#        - t_order,t_order_item
+    #打开sql输出日志
+    props:
+      sql:
+        show: true
+
+mybatis:
+  mapper-locations: classpath:/mapper/*.xml
